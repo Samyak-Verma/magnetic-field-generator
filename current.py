@@ -1,7 +1,5 @@
 import pyvisa as visa
-import pandas as pd
 import os
-import openpyxl
 import time
 from datetime import datetime
 from Common.CSVWriter import CSVWriter
@@ -11,21 +9,6 @@ from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
 
 if os.path.exists('output') == False:
 	os.mkdir('output')
-
-def record_data_in_excel(current, file_name):
-	try:
-		data = pd.read_excel(file_name, index_col=0)
-	except FileNotFoundError:
-		data = pd.DataFrame(columns=['Time', 'Current (A)'])
-
-	new_data = pd.DataFrame({
-		'Time': [datetime.now()],
-		'Current (A)': [current],
-	})
-
-	data = pd.concat([data, new_data], ignore_index=True)
-	data.to_excel(file_name)
-	print(f"Data recorded in {file_name}")
 
 def check_and_get_filename(SettingsHolder: TOMLSettings):
 	if SettingsHolder.using_toml() is False:
@@ -81,14 +64,32 @@ class DataCollector(Observable):
 			current_source_amperage = Source.amperage,
 		)
 
+		# modified on runtime
+		self.start_time = 0
+		self.time_to_initialize = 0
+
 	def collect_data(self):
+		self.start_time = time.time()
 		while True:
 			time.sleep(self.wait_time)
 			time.sleep(1) # delete me later thanks
+
 			self.nanovoltmeter.prepare_for_results()
 
 			read_voltage = self.nanovoltmeter.get_results()
+			if self.time_to_initialize == 0: # important to have this so data looks clean
+				self.time_to_initialize = time.time() - self.start_time
+
+			raw_time_of_measurement = round((time.time() - self.start_time) - self.time_to_initialize, ndigits = 1) # we can be more precise in time measurement but it doesn't matter
+			time_of_measurement = f'{raw_time_of_measurement:10.2f}'
+	
 			print(read_voltage)
+			results_dict = {
+				"time": time_of_measurement,
+				"stage_voltage": 0,
+				"read_voltage": read_voltage,
+			}
+			self.CSV.write(results_dict)
 
 
 def main():
