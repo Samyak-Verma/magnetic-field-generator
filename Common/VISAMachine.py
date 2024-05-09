@@ -103,14 +103,19 @@ class TemperatureNanovoltmeter(Nanovoltmeter):
 		return super().additional_setup(machine)
 
 class PowerSupply(VisaMachine):
-	def __init__(self, visa_address, RM, current):
+	def __init__(self, visa_address, RM, voltage, current):
+		self.voltage = voltage
 		self.current = current
 		super().__init__("Power Supply", visa_address, RM)
 
 	def additional_setup(self, machine):
 		super().additional_setup(machine)
 		machine.write("*RST")
+
 		machine.write(f'CURR {self.current}')
 		response = machine.query('CURR?').rstrip()
 		print(f"Current confirmed at: {response} A")
-		print(machine.query("MODE"))
+
+		machine.write(f'VOLT {self.voltage}')
+		response = machine.query('VOLT?').rstrip()
+		print(f"Voltage confirmed at: {response} V")

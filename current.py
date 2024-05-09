@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import openpyxl
 from datetime import datetime
-from Common.VISAMachine import PowerSupply
+from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
 
 if os.path.exists('output') == False:
 	os.mkdir('output')
@@ -40,7 +40,9 @@ def main():
 	# user_current = user_inputs[1]
 
 	rm = visa.ResourceManager()
-	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, 0.1) # sets up the current and sets it to the needed mode
+	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, voltage = 20, current = 0.5) # sets up the current and sets it to the needed mode
+	Nanovoltmeter = VoltageNanovoltmeter('GPIB0::7::INSTR', rm, voltmeter_range = 0.1)
+	KeithleySource = CurrentSource('GPIB0::8::INSTR', rm)
 
 	# record_data_in_excel(user_current, file_name)
 
