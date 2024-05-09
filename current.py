@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import openpyxl
 from datetime import datetime
-from Common.VISAMachine import VoltageNanovoltmeter, PowerSupply
+from Common.VISAMachine import PowerSupply
 
 if os.path.exists('output') == False:
 	os.mkdir('output')
@@ -22,26 +22,15 @@ def send_current_to_power_supply(current, power_supply):
 	except Exception as ex:
 		print(f"An error occurred with the power supply: {ex}")
 
-def read_voltage_from_nanovoltmeter(nanovoltmeter):
-	try:
-		voltage = nanovoltmeter.query('READ?').rstrip()
-		print(f"Voltage read as: {voltage} V")
-		return voltage
-	except visa.VisaIOError as e:
-		print(f"Error communicating with the nanovoltmeter: {e}")
-	except Exception as ex:
-		print(f"An error occurred with the nanovoltmeter: {ex}")
-
-def record_data_in_excel(current, voltage, file_name):
+def record_data_in_excel(current, file_name):
 	try:
 		data = pd.read_excel(file_name, index_col=0)
 	except FileNotFoundError:
-		data = pd.DataFrame(columns=['Time', 'Current (A)', 'Voltage (V)'])
+		data = pd.DataFrame(columns=['Time', 'Current (A)'])
 
 	new_data = pd.DataFrame({
 		'Time': [datetime.now()],
 		'Current (A)': [current],
-		'Voltage (V)': [voltage]
 	})
 
 	data = pd.concat([data, new_data], ignore_index=True)
@@ -63,17 +52,14 @@ def main():
 	user_inputs = get_variables()
 	file_name = user_inputs[0]
 	user_current = user_inputs[1]
-	
+
 	rm = visa.ResourceManager()
 	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, user_current)
-	Keithley = VoltageNanovoltmeter('GPIB0::5::INSTR', rm, 1e-6)
 
 	send_current_to_power_supply(user_current, KEPCO)
-	voltage = read_voltage_from_nanovoltmeter(Keithley)
-	record_data_in_excel(user_current, voltage, file_name)
+	record_data_in_excel(user_current, file_name)
 
 	KEPCO.close()
-	Keithley.close()
 
 if __name__ == "__main__":
 	main()
