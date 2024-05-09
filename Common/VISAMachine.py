@@ -101,3 +101,12 @@ class TemperatureNanovoltmeter(Nanovoltmeter):
 		machine.write(":CONF:TEMP")
 		machine.write(":SENS:TEMP:DIG 7")
 		return super().additional_setup(machine)
+
+class PowerSupply(VisaMachine):
+	def __init__(self, visa_address, RM, current):
+		self.current = current
+		super().__init__("Power Supply", visa_address, RM)
+
+	def additional_setup(self, machine):
+		super().additional_setup(machine)
+		machine.write("*RST")
