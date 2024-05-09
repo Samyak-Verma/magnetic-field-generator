@@ -1,6 +1,10 @@
 import pyvisa as visa
 import pandas as pd
+import os
 from datetime import datetime
+
+if os.path.exists('output') == False:
+	os.mkdir('output')
 
 def send_current_to_power_supply(current, power_supply):
 	try:
@@ -44,11 +48,13 @@ def record_data_in_excel(current, voltage, file_name):
 
 def main():
 	rm = visa.ResourceManager()
+
+	input_file_name = input("Enter the name of the Excel file to save data (include .xlsx): ")
+	file_name = f"output/{input_file_name}"
+	user_current = float(input("Enter the current value to set (in A): "))
+
 	power_supply = rm.open_resource('GPIB0::6::INSTR')
 	nanovoltmeter = rm.open_resource('GPIB0::5::INSTR')  # Replace 'Address' with the actual GPIB address
-
-	file_name = input("Enter the name of the Excel file to save data (include .xlsx): ")
-	user_current = float(input("Enter the current value to set (in A): "))
 
 	send_current_to_power_supply(user_current, power_supply)
 	voltage = read_voltage_from_nanovoltmeter(nanovoltmeter)
