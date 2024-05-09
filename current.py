@@ -29,7 +29,14 @@ def main():
 	if TOMLSettingsHolder.using_toml() is False:
 		print("You must set USE_TOML to true in MagneticFieldSettings.toml to use this script.")
 		return
+	
+	toml_file_name = TOMLSettingsHolder.get("file_name")
+	if(toml_file_name == TOMLSettingsHolder.defaults["file_name"]):
+		toml_file_name = f"output-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+		print(f"We are loading a default file name from TOML, using a safety feature to avoid this. Will save as {toml_file_name}")
+		return
 
+	file_name = f"output/{toml_file_name}"
 	rm = visa.ResourceManager()
 	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, voltage = 20, current = 0.5) # sets up the current and sets it to the needed mode
 	Nanovoltmeter = VoltageNanovoltmeter('GPIB0::7::INSTR', rm, voltmeter_range = 0.1)

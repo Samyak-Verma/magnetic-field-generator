@@ -34,7 +34,7 @@ class TOMLSettings(object):
 			if read_settings["USE_TOML"] is True: # we assume the user willfully left this as false, we notify them via the CLI what we're reading from anyways
 				self.settings = read_settings
 
-		self.create_file_directory()
+		# self.create_file_directory()
 
 	def create_file_directory(self):
 		file_directory = None
