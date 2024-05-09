@@ -35,14 +35,14 @@ def get_variables():
 	return file_name, user_current
 
 def main():
-	user_inputs = get_variables()
-	file_name = user_inputs[0]
-	user_current = user_inputs[1]
+	# user_inputs = get_variables()
+	# file_name = user_inputs[0]
+	# user_current = user_inputs[1]
 
 	rm = visa.ResourceManager()
-	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, user_current) # sets up the current and sets it to the needed mode
+	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, 0.1) # sets up the current and sets it to the needed mode
 
-	record_data_in_excel(user_current, file_name)
+	# record_data_in_excel(user_current, file_name)
 
 	KEPCO.close()
 

@@ -113,3 +113,4 @@ class PowerSupply(VisaMachine):
 		machine.write(f'CURR {self.current}')
 		response = machine.query('CURR?').rstrip()
 		print(f"Current confirmed at: {response} A")
+		print(machine.query("MODE"))
