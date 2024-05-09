@@ -14,11 +14,11 @@ class CSVWriter(object):
 		# each entry is written left-to-right horizontally in order
 		file_header = [
 			"Time (seconds)",
-			"Stage Voltage - Power Supply (V)"
+			"Stage Voltage - Power Supply (V)",
 			"Read Voltage - Nanovoltmeter (V)",
-			f"Power Supply Amperage (A): {'%.2E' % Decimal(self.power_amperage)}"
-			f"Power Supply Voltage (V): {'%.2E' % Decimal(self.power_voltage)}"
-			f"Current Source Amperage (A): {'%.2E' % Decimal(self.current_source_amperage)}"
+			f"Power Supply Amperage (A): {'%.2E' % Decimal(self.power_amperage)}",
+			f"Power Supply Voltage (V): {'%.2E' % Decimal(self.power_voltage)}",
+			f"Current Source Amperage (A): {'%.2E' % Decimal(self.current_source_amperage)}",
 		]
 
 		with open(self.file_path, 'w', newline='') as csvfile:
