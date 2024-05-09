@@ -24,6 +24,9 @@ def record_data_in_excel(current, file_name):
 	data.to_excel(file_name)
 	print(f"Data recorded in {file_name}")
 
+def collect_data(machines_dict, milliseconds_between_measurements):
+	
+
 def main():
 	TOMLSettingsHolder = TOMLSettings()
 	if TOMLSettingsHolder.using_toml() is False:
@@ -34,7 +37,6 @@ def main():
 	if(toml_file_name == TOMLSettingsHolder.defaults["file_name"]):
 		toml_file_name = f"output-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
 		print(f"We are loading a default file name from TOML, using a safety feature to avoid this. Will save as {toml_file_name}")
-		return
 
 	file_name = f"output/{toml_file_name}"
 	rm = visa.ResourceManager()
@@ -56,16 +58,22 @@ def main():
 			amperage = TOMLSettingsHolder.get("currentsource_amperage"),
 			compliance = TOMLSettingsHolder.get("currentsource_compliance"),
 		)
-	except visa.VisaIOError:
-		print("Could not connect to one of the machines. Please check your connections.")
+	except visa.VisaIOError as e:
+		print(f"Could not connect to one of the machines. Please check your connections. {e}")
 		return
 	
-	machines = [KEPCO, Nanovoltmeter, KeithleySource]
+	machines_dict = {
+		"Power Supply": KEPCO,
+		"Voltage Nanovoltmeter": Nanovoltmeter,
+		"Current Source": KeithleySource,
+	}
+
+	results = collect_data(machines_dict, TOMLSettingsHolder.get("milliseconds_between_measurements"))
 
 	# record_data_in_excel(user_current, file_name)
 
-	for machine in machines:
-		machine.close()
+	for thing in machines_dict:
+		machines_dict[thing].close()
 
 if __name__ == "__main__":
 	main()
