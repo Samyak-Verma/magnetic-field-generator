@@ -28,10 +28,13 @@ def get_variables():
 	if input_file_name == "":
 		input_file_name = "data.xlsx"
 	file_name = f"output/{input_file_name}"
+
 	user_current = 0.1
-	cli_current = input("Enter the current value to set (in A): ")
+	cli_current = input("Enter the Power Supply current value to set (in A): ")
 	if cli_current != "":
 		user_current = float(cli_current)
+
+	
 	return file_name, user_current
 
 def main():

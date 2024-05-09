@@ -11,7 +11,7 @@ class TOMLSettings(object):
 			"file_name": "default.xlsx",
 			"milliseconds_between_measurements": 0,
 			"nanovoltmeter_range": 10,
-			"output_directory": "./output",
+			"file_directory": "./output",
 			"powersupply_current": 0.5,
 			"powersupply_voltage_compliance": 20,
 		})
