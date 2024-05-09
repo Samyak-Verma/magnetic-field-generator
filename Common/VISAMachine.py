@@ -16,6 +16,7 @@ class VisaMachine(object):
 		intializing_machine = self.base_connection()
 		self.additional_setup(intializing_machine)
 		self.resource = intializing_machine
+		print("=====================================")
 
 	def base_connection(self):
 		print(f"Initializing {self.name} at {self.visa_address}")

@@ -39,12 +39,6 @@ def check_and_get_filename(SettingsHolder: TOMLSettings):
 def setup_machines(SettingsHolder: TOMLSettings):
 	rm = visa.ResourceManager()
 	try:
-		KEPCO = PowerSupply(
-			'GPIB0::6::INSTR',
-			rm,
-			voltage = SettingsHolder.get("powersupply_voltage_compliance"),
-			current = SettingsHolder.get("powersupply_current"),
-		)
 		Nanovoltmeter = VoltageNanovoltmeter(
 			'GPIB0::8::INSTR',
 			rm,
@@ -55,6 +49,12 @@ def setup_machines(SettingsHolder: TOMLSettings):
 			rm,
 			amperage = SettingsHolder.get("currentsource_amperage"),
 			compliance = SettingsHolder.get("currentsource_compliance"),
+		)
+		KEPCO = PowerSupply(
+			'GPIB0::6::INSTR',
+			rm,
+			voltage = SettingsHolder.get("powersupply_voltage_compliance"),
+			current = SettingsHolder.get("powersupply_current"),
 		)
 	except visa.VisaIOError as e:
 		print(f"Could not connect to one of the machines. Please check your connections. {e}")
@@ -73,19 +73,23 @@ class DataCollector(Observable):
 		self.wait_time = TOMLSettingsHolder.get("milliseconds_between_measurements") / 1000
 
 	def collect_data(self):
-		time.sleep(self.wait_time)
-		self.nanovoltmeter.prepare_for_results()
+		while True:
+			time.sleep(self.wait_time)
+			time.sleep(1) # delete me later thanks
+			self.nanovoltmeter.prepare_for_results()
 
-		read_voltage = self.nanovoltmeter.get_results()
+			read_voltage = self.nanovoltmeter.get_results()
+			print(read_voltage)
 
 
 def main():
 	TOMLSettingsHolder = TOMLSettings()
 
 	file_name = check_and_get_filename(TOMLSettingsHolder)
-	machines_dict = setup_machines()
+	machines_dict = setup_machines(TOMLSettingsHolder)
 
-	DataCollector(machines_dict)
+	data_collector = DataCollector(machines_dict, TOMLSettingsHolder)
+	data_collector.collect_data()
 
 	# record_data_in_excel(user_current, file_name)
 
