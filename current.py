@@ -50,9 +50,12 @@ def record_data_in_excel(current, voltage, file_name):
 def main():
 	rm = visa.ResourceManager()
 
+	input_file_name = ""
 	input_file_name = input("Enter the name of the Excel file to save data (include .xlsx): ")
+	if input_file_name == "":
+		input_file_name = "data.xlsx"
 	file_name = f"output/{input_file_name}"
-	user_current = float(input("Enter the current value to set (in A): "))
+	user_current = float(input("Enter the current value to set (in A): ") if not "" else 0.1)
 
 	PowerSupply = PowerSupply('GPIB0::6::INSTR', rm, user_current)
 	nanovoltmeter = rm.open_resource('GPIB0::5::INSTR')
