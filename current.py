@@ -38,23 +38,28 @@ def main():
 
 	file_name = f"output/{toml_file_name}"
 	rm = visa.ResourceManager()
-	KEPCO = PowerSupply(
-		'GPIB0::6::INSTR',
-		rm,
-		voltage = TOMLSettingsHolder.get("powersupply_voltage_compliance"),
-		current = TOMLSettingsHolder.get("powersupply_current"),
-	)
-	Nanovoltmeter = VoltageNanovoltmeter(
-		'GPIB0::8::INSTR',
-		rm,
-		voltmeter_range = TOMLSettingsHolder.get("nanovoltmeter_range"),
-	)
-	KeithleySource = CurrentSource(
-		'GPIB0::10::INSTR',
-		rm,
-		amperage = TOMLSettingsHolder.get("currentsource_amperage"),
-		compliance = TOMLSettingsHolder.get("currentsource_compliance"),
-	)
+	try:
+		KEPCO = PowerSupply(
+			'GPIB0::6::INSTR',
+			rm,
+			voltage = TOMLSettingsHolder.get("powersupply_voltage_compliance"),
+			current = TOMLSettingsHolder.get("powersupply_current"),
+		)
+		Nanovoltmeter = VoltageNanovoltmeter(
+			'GPIB0::8::INSTR',
+			rm,
+			voltmeter_range = TOMLSettingsHolder.get("nanovoltmeter_range"),
+		)
+		KeithleySource = CurrentSource(
+			'GPIB0::10::INSTR',
+			rm,
+			amperage = TOMLSettingsHolder.get("currentsource_amperage"),
+			compliance = TOMLSettingsHolder.get("currentsource_compliance"),
+		)
+	except visa.VisaIOError:
+		print("Could not connect to one of the machines. Please check your connections.")
+		return
+	
 	machines = [KEPCO, Nanovoltmeter, KeithleySource]
 
 	# record_data_in_excel(user_current, file_name)
