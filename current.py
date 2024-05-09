@@ -38,13 +38,29 @@ def main():
 
 	file_name = f"output/{toml_file_name}"
 	rm = visa.ResourceManager()
-	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, voltage = 20, current = 0.5) # sets up the current and sets it to the needed mode
-	Nanovoltmeter = VoltageNanovoltmeter('GPIB0::7::INSTR', rm, voltmeter_range = 0.1)
-	KeithleySource = CurrentSource('GPIB0::8::INSTR', rm)
+	KEPCO = PowerSupply(
+		'GPIB0::6::INSTR',
+		rm,
+		voltage = TOMLSettingsHolder.get("powersupply_voltage_compliance"),
+		current = TOMLSettingsHolder.get("powersupply_current"),
+	)
+	Nanovoltmeter = VoltageNanovoltmeter(
+		'GPIB0::8::INSTR',
+		rm,
+		voltmeter_range = TOMLSettingsHolder.get("nanovoltmeter_range"),
+	)
+	KeithleySource = CurrentSource(
+		'GPIB0::10::INSTR',
+		rm,
+		amperage = TOMLSettingsHolder.get("currentsource_amperage"),
+		compliance = TOMLSettingsHolder.get("currentsource_compliance"),
+	)
+	machines = [KEPCO, Nanovoltmeter, KeithleySource]
 
 	# record_data_in_excel(user_current, file_name)
 
-	KEPCO.close()
+	for machine in machines:
+		machine.close()
 
 if __name__ == "__main__":
 	main()
