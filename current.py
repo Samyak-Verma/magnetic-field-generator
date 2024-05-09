@@ -55,17 +55,20 @@ def main():
 	if input_file_name == "":
 		input_file_name = "data.xlsx"
 	file_name = f"output/{input_file_name}"
-	user_current = float(input("Enter the current value to set (in A): ") if not "" else 0.1)
+	user_current = 0.1
+	cli_current = input("Enter the current value to set (in A): ")
+	if cli_current != "":
+		user_current = float(cli_current)
 
-	PowerSupply = PowerSupply('GPIB0::6::INSTR', rm, user_current)
-	nanovoltmeter = rm.open_resource('GPIB0::5::INSTR')
+	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, user_current)
+	Keithley = Nanovoltmeter('GPIB0::5::INSTR', rm)
 
-	send_current_to_power_supply(user_current, PowerSupply)
-	voltage = read_voltage_from_nanovoltmeter(nanovoltmeter)
+	send_current_to_power_supply(user_current, KEPCO)
+	voltage = read_voltage_from_nanovoltmeter(Keithley)
 	record_data_in_excel(user_current, voltage, file_name)
 
-	PowerSupply.close()
-	nanovoltmeter.close()
+	KEPCO.close()
+	Keithley.close()
 
 if __name__ == "__main__":
 	main()
