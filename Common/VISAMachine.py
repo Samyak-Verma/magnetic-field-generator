@@ -70,16 +70,16 @@ class Nanovoltmeter(VisaMachine):
 	def __init__(self, name, visa_address, RM):
 		super().__init__(name, visa_address, RM)
 
+	def additional_setup(self, machine):
+		machine.write(":STAT:OPER:ENAB 1")
+		return super().additional_setup(machine)
+
 	def prepare_for_results(self):
 		self.write(":INIT")
 
 	def get_results(self):
 		self.query("*OPC?")
 		return float(self.query(":FETC?"))
-
-	def additional_setup(self, machine):
-		machine.write(":STAT:OPER:ENAB 1")
-		return super().additional_setup(machine)
 
 class VoltageNanovoltmeter(Nanovoltmeter):
 	def __init__(self, visa_address, RM, voltmeter_range):
