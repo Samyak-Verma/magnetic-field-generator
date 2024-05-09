@@ -8,20 +8,6 @@ from Common.VISAMachine import PowerSupply
 if os.path.exists('output') == False:
 	os.mkdir('output')
 
-def send_current_to_power_supply(current, power_supply):
-	try:
-		# Set current
-		power_supply.write(f'CURR {current}')
-		print(f"Current set to {current} A")
-
-		# Optionally, read back the set value if necessary
-		response = power_supply.query('CURR?').rstrip()
-		print(f"Current confirmed at: {response} A")
-	except visa.VisaIOError as e:
-		print(f"Error communicating with the power supply: {e}")
-	except Exception as ex:
-		print(f"An error occurred with the power supply: {ex}")
-
 def record_data_in_excel(current, file_name):
 	try:
 		data = pd.read_excel(file_name, index_col=0)
@@ -54,9 +40,8 @@ def main():
 	user_current = user_inputs[1]
 
 	rm = visa.ResourceManager()
-	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, user_current)
+	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, user_current) # sets up the current and sets it to the needed mode
 
-	send_current_to_power_supply(user_current, KEPCO)
 	record_data_in_excel(user_current, file_name)
 
 	KEPCO.close()

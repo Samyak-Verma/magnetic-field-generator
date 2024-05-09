@@ -110,3 +110,6 @@ class PowerSupply(VisaMachine):
 	def additional_setup(self, machine):
 		super().additional_setup(machine)
 		machine.write("*RST")
+		machine.write(f'CURR {self.current}')
+		response = machine.query('CURR?').rstrip()
+		print(f"Current confirmed at: {response} A")
