@@ -3,20 +3,17 @@ import os
 
 class TOMLSettings(object):
 	def __init__(self):
-		self.toml_path = "./ResistanceTesterSettings.toml"
+		self.toml_path = "./MagneticFieldSettings.toml"
 		# Edit these defaults as needed
 		self.defaults = dict({
-			"amperage": 1e-6,
-			"comment": "",
-			"compliance": 10,
-			"default_number_of_entries": 150,
-			"GPIB_current_source_integer": 10,
-			"GPIB_nanovoltmeter_integer_temperature": 8,
-			"GPIB_nanovoltmeter_integer_voltage": 5,
-			"infinite_mode": False,
+			"currentsource_amperage": 1e-6,
+			"currentsource_compliance": 10,
+			"file_name": "default.xlsx",
 			"milliseconds_between_measurements": 0,
-			"voltmeter_range": 10,
-			"file_directory": "./ResistanceTesterData",
+			"nanovoltmeter_range": 10,
+			"output_directory": "./output",
+			"powersupply_current": 0.5,
+			"powersupply_voltage_compliance": 20,
 		})
 		self.settings = None
 
