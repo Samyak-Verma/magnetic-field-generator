@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import openpyxl
 from datetime import datetime
+from Common.TOMLSettings import TOMLSettings
 from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
 
 if os.path.exists('output') == False:
@@ -23,24 +24,11 @@ def record_data_in_excel(current, file_name):
 	data.to_excel(file_name)
 	print(f"Data recorded in {file_name}")
 
-def get_variables():
-	input_file_name = input("Enter the name of the Excel file to save data (include .xlsx): ")
-	if input_file_name == "":
-		input_file_name = "data.xlsx"
-	file_name = f"output/{input_file_name}"
-
-	user_current = 0.1
-	cli_current = input("Enter the Power Supply current value to set (in A): ")
-	if cli_current != "":
-		user_current = float(cli_current)
-
-	
-	return file_name, user_current
-
 def main():
-	# user_inputs = get_variables()
-	# file_name = user_inputs[0]
-	# user_current = user_inputs[1]
+	TOMLSettingsHolder = TOMLSettings()
+	if TOMLSettingsHolder.using_toml() is False:
+		print("You must set USE_TOML to true in MagneticFieldSettings.toml to use this script.")
+		return
 
 	rm = visa.ResourceManager()
 	KEPCO = PowerSupply('GPIB0::6::INSTR', rm, voltage = 20, current = 0.5) # sets up the current and sets it to the needed mode
