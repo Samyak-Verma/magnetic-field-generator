@@ -4,6 +4,7 @@ import os
 import openpyxl
 import time
 from datetime import datetime
+from Common.Observable import Observable
 from Common.TOMLSettings import TOMLSettings
 from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
 
@@ -65,11 +66,17 @@ def setup_machines(SettingsHolder: TOMLSettings):
 		"Current Source": KeithleySource,
 	}
 
-def collect_data(machines_dict, milliseconds_between_measurements):
-	returnable_results = []
-	nanovoltmeter = machines_dict["Voltage Nanovoltmeter"]
-	while True:
-		time.wait(milliseconds_between_measurements / 1000)
+class DataCollector(Observable):
+	def __init__(self, machines_dict, TOMLSettingsHolder: TOMLSettings):
+		super().__init__()
+		self.nanovoltmeter = machines_dict["Voltage Nanovoltmeter"]
+		self.wait_time = TOMLSettingsHolder.get("milliseconds_between_measurements") / 1000
+
+	def collect_data(self):
+		time.sleep(self.wait_time)
+		self.nanovoltmeter.prepare_for_results()
+
+		read_voltage = self.nanovoltmeter.get_results()
 
 
 def main():
@@ -78,7 +85,7 @@ def main():
 	file_name = check_and_get_filename(TOMLSettingsHolder)
 	machines_dict = setup_machines()
 
-	results = collect_data(machines_dict, TOMLSettingsHolder.get("milliseconds_between_measurements"))
+	DataCollector(machines_dict)
 
 	# record_data_in_excel(user_current, file_name)
 
