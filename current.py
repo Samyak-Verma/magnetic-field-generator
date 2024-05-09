@@ -57,22 +57,27 @@ class DataCollector(Observable):
 		super().__init__()
 		self.nanovoltmeter = machines_dict["Voltage Nanovoltmeter"]
 		self.wait_time = TOMLSettingsHolder.get("milliseconds_between_measurements") / 1000
-		Supply: PowerSupply = machines_dict["Power Supply"]
-		Source: CurrentSource = machines_dict["Current Source"]
+		self.Supply: PowerSupply = machines_dict["Power Supply"]
+		self.Source: CurrentSource = machines_dict["Current Source"]
 		self.CSV = CSVWriter(
 			file_path = filename,
-			power_amperage = Supply.current,
-			power_voltage = Supply.voltage,
-			current_source_amperage = Source.amperage,
+			power_amperage = self.Supply.current,
+			power_voltage = self.Supply.voltage,
+			current_source_amperage = self.Source.amperage,
 		)
 
 		# modified on runtime
 		self.start_time = 0
 		self.time_to_initialize = 0
+		self.number_of_runs = 0
+		self.current_stage = 0
 
 	def collect_data(self):
 		self.start_time = time.time()
 		while True:
+			if(self.number_of_runs is not 0 and self.number_of_runs % 10 is 0 and self.current_stage >= 5):
+				self.increment_stage()
+
 			time.sleep(self.wait_time)
 			time.sleep(1) # delete me later thanks
 
@@ -88,10 +93,17 @@ class DataCollector(Observable):
 			print(read_voltage)
 			results_dict = {
 				"time": time_of_measurement,
-				"stage_voltage": 0,
+				"stage_voltage": self.current_stage,
 				"read_voltage": read_voltage,
 			}
 			self.CSV.write(results_dict)
+
+			self.number_of_runs += 1
+
+	def increment_stage(self):
+		self.current_stage += 1
+		self.Supply.write("whatever")
+		return
 
 
 def main():
