@@ -17,8 +17,10 @@ def check_and_get_filename(SettingsHolder: TOMLSettings):
 	
 	toml_file_name = SettingsHolder.get("file_name")
 	if(toml_file_name == SettingsHolder.defaults["file_name"]):
-		toml_file_name = f"output-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+		toml_file_name = f"output-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
 		print(f"We are loading a default file name from TOML, using a safety feature to avoid this. Will save as {toml_file_name}")
+
+	return f"output/{toml_file_name}"
 
 def setup_machines(SettingsHolder: TOMLSettings):
 	rm = visa.ResourceManager()

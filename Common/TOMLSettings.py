@@ -8,7 +8,7 @@ class TOMLSettings(object):
 		self.defaults = dict({
 			"currentsource_amperage": 1e-6,
 			"currentsource_compliance": 10,
-			"file_name": "default.xlsx",
+			"file_name": "default.csv",
 			"milliseconds_between_measurements": 0,
 			"nanovoltmeter_range": 10,
 			"file_directory": "./output",
