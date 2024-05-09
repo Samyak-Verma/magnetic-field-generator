@@ -2,6 +2,7 @@ import pyvisa as visa
 import pandas as pd
 import os
 import openpyxl
+import time
 from datetime import datetime
 from Common.TOMLSettings import TOMLSettings
 from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
@@ -65,13 +66,17 @@ def setup_machines(SettingsHolder: TOMLSettings):
 	}
 
 def collect_data(machines_dict, milliseconds_between_measurements):
+	returnable_results = []
+	nanovoltmeter = machines_dict["Voltage Nanovoltmeter"]
+	while True:
+		time.wait(milliseconds_between_measurements / 1000)
 
 
 def main():
 	TOMLSettingsHolder = TOMLSettings()
 
 	file_name = check_and_get_filename(TOMLSettingsHolder)
-	machines_dict = setup_machines(TOMLSettingsHolder)
+	machines_dict = setup_machines()
 
 	results = collect_data(machines_dict, TOMLSettingsHolder.get("milliseconds_between_measurements"))
 
