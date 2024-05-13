@@ -101,19 +101,20 @@ class DataCollector(Observable):
 		# What we do in "single run" is a task-specific operation for the intents of our experiment.
 		# We will take the input from SettingsHolder and read the voltage once.
 		# We will then set Magnet Current to 0, and read the voltage again.
-		# This will be output to console and written to CSV file.
 		self.start_time = time.time()
 		self.nanovoltmeter.prepare_for_results()
-		read_voltage = self.nanovoltmeter.get_results()
+		voltage_one = self.nanovoltmeter.get_results()
 		self.time_to_initialize = time.time() - self.start_time
-		print(f"Voltage Read: {read_voltage}")
+		print(f"Voltage^1 Read: {voltage_one}")
 
 		print(f"Now turning the magnet current off.")
 		self.Supply.disable_output()
 		time.sleep(1) # let the magnet current pass a bit as a precaution
 		self.nanovoltmeter.prepare_for_results()
-		read_voltage = self.nanovoltmeter.get_results()
-		print(f"Voltage Read: {read_voltage}")
+		voltage_two = self.nanovoltmeter.get_results()
+		print(f"Voltage^2 Read: {voltage_two}")
+
+		print(f"deltaVoltage: {voltage_two - voltage_one}")
 
 	def increment_stage(self):
 		self.current_stage += 1
