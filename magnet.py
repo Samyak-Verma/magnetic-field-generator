@@ -6,6 +6,7 @@ from Common.CSVWriter import CSVWriter
 from Common.Observable import Observable
 from Common.Settings import Settings
 from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
+from Common.Spans import span
 
 if os.path.exists('output') == False:
 	os.mkdir('output')
@@ -105,16 +106,16 @@ class DataCollector(Observable):
 		self.nanovoltmeter.prepare_for_results()
 		voltage_one = self.nanovoltmeter.get_results()
 		self.time_to_initialize = time.time() - self.start_time
-		print(f"Voltage^1 Read: {voltage_one}")
+		print(span.blue(f"Voltage^1 Read: {voltage_one}"))
 
 		print(f"Now turning the magnet current off.")
 		self.Supply.disable_output()
 		time.sleep(1) # let the magnet current pass a bit as a precaution
 		self.nanovoltmeter.prepare_for_results()
 		voltage_two = self.nanovoltmeter.get_results()
-		print(f"Voltage^2 Read: {voltage_two}")
+		print(span.blue(f"Voltage^2 Read: {voltage_two}"))
 
-		print(f"deltaVoltage: {voltage_two - voltage_one}")
+		print(span.green(f"deltaVoltage: {voltage_two - voltage_one}"))
 
 	def increment_stage(self):
 		self.current_stage += 1
