@@ -68,7 +68,7 @@ class DataCollector(Observable):
 		self.number_of_runs = 0
 		self.current_stage = 0
 
-	def collect_data_infinit(self):
+	def collect_data_infinite(self):
 		self.start_time = time.time()
 		while True:
 			if(self.number_of_runs is not 0 and self.number_of_runs % 10 is 0 and self.current_stage >= 5):
@@ -87,14 +87,33 @@ class DataCollector(Observable):
 			time_of_measurement = f'{raw_time_of_measurement:10.2f}'
 	
 			print(f"Voltage Read: {read_voltage}")
-			results_dict = {
-				"time": time_of_measurement,
-				"stage_voltage": self.current_stage,
-				"read_voltage": read_voltage,
-			}
-			self.CSV.write(results_dict)
+			# results_dict = {
+			# 	"time": time_of_measurement,
+			# 	"stage_voltage": self.current_stage,
+			# 	"read_voltage": read_voltage,
+			# }
+			# self.CSV.write(results_dict)
+			# above broken due to single_run, fix later
 			
 			self.number_of_runs += 1
+
+	def single_run(self):
+		# What we do in "single run" is a task-specific operation for the intents of our experiment.
+		# We will take the input from SettingsHolder and read the voltage once.
+		# We will then set Magnet Current to 0, and read the voltage again.
+		# This will be output to console and written to CSV file.
+		self.start_time = time.time()
+		self.nanovoltmeter.prepare_for_results()
+		read_voltage = self.nanovoltmeter.get_results()
+		self.time_to_initialize = time.time() - self.start_time
+		print(f"Voltage Read: {read_voltage}")
+
+		print(f"Now turning the magnet current off.")
+		self.Supply.disable_output()
+		time.sleep(1) # let the magnet current pass a bit as a precaution
+		self.nanovoltmeter.prepare_for_results()
+		read_voltage = self.nanovoltmeter.get_results()
+		print(f"Voltage Read: {read_voltage}")
 
 	def increment_stage(self):
 		self.current_stage += 1
@@ -107,15 +126,15 @@ def standard_operation(SettingsHolder):
 	machines_dict = setup_machines(SettingsHolder)
 
 	data_collector = DataCollector(machines_dict, file_name, SettingsHolder)
-	data_collector.collect_data()
-	# record_data_in_excel(user_current, file_name)
+	data_collector.single_run()
+	# data_collector.collect_data_infinite()
 
 	for thing in machines_dict:
 		machines_dict[thing].close()
 
 def CLI_input(SettingsHolder: Settings):
-	SettingsHolder.set("powersupply_current", float(input("Enter the current for the magnet (A): ")))
-	SettingsHolder.set("currentsource_amperage", float(input("Enter the amperage for the current source (A): ")))
+	SettingsHolder.set("powersupply_current", float(input("Enter the current for the magnet. (A): ")))
+	SettingsHolder.set("currentsource_amperage", float(input("Enter the amperage for the current source (sample). (A): ")))
 
 def main():
 	SettingsHolder = Settings()

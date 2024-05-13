@@ -16,6 +16,7 @@ class VisaMachine(object):
 		intializing_machine = self.base_connection()
 		self.additional_setup(intializing_machine)
 		self.resource = intializing_machine
+		self.validate_settings(True)
 		print("=====================================")
 
 	def base_connection(self):
@@ -23,6 +24,9 @@ class VisaMachine(object):
 		intializing_machine = self.RM.open_resource(self.visa_address)
 		intializing_machine.timeout = self.timeout
 		return intializing_machine
+	
+	def validate_settings(self, initializing = False):
+		return
 	
 	def write(self, command):
 		return self.resource.write(command)
@@ -53,15 +57,18 @@ class CurrentSource(VisaMachine):
 		machine.write(":SOUR:CLEAR")
 		machine.write(":SOUR:CURR:RANG:AUTO ON")
 		machine.write(f":SOUR:CURR:COMP {self.compliance}")
-		validated_compliance = f"{machine.query(":SOUR:CURR:COMP?")}".rstrip()
-		print(f"Current Source is set to {float(validated_compliance):.2f} V compliance")
 
 		machine.write(f":SOUR:CURR {self.amperage:.9f}")
 		machine.write(":OUTP ON")
-		validated_output = f"{machine.query(":SOUR:CURR:AMPL?")}".rstrip()
+
+		time.sleep(1) # let amperage pass a bit as a precaution
+
+	def validate_settings(self, initializing = False):
+		validated_compliance = f"{self.query(":SOUR:CURR:COMP?")}".rstrip()
+		print(f"Current Source is set to {float(validated_compliance):.2f} V compliance")
+		validated_output = f"{self.query(":SOUR:CURR:AMPL?")}".rstrip()
 		self.amperage = float(validated_output)
 		print(f"Current Source is outputting {validated_output} A")
-		time.sleep(1) # let amperage pass a bit as a precaution
 
 	def pre_close(self):
 		# self.write(":OUTP OFF") works but is annoying for the time being
@@ -114,9 +121,17 @@ class PowerSupply(VisaMachine):
 		machine.write("*RST")
 
 		machine.write(f'CURR {self.current}')
-		response = machine.query('CURR?').rstrip()
-		print(f"Current confirmed at: {response} A")
-
 		machine.write(f'VOLT {self.voltage}')
-		response = machine.query('VOLT?').rstrip()
+
+	def validate_settings(self, initializing = False):
+		response = self.query('CURR?').rstrip()
+		print(f"Current confirmed at: {response} A")
+		response = self.query('VOLT?').rstrip()
 		print(f"Voltage confirmed at: {response} V")
+		if not initializing:
+			print("=====================================")
+
+	def disable_output(self):
+		self.write("CURR 0")
+		self.write("OUTP OFF")
+		self.validate_settings()
