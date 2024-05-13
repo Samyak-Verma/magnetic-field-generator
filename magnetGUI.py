@@ -24,37 +24,16 @@ def create_inputs():
 	dpg.add_text("Change the values below to change the settings for the magnet.")
 	dpg.add_text("The following do not need to be changed very often, but are presented if you need.")
 	
-	with dpg.group(horizontal=True):
-		dpg.add_text("File Directory")
-		input_fields.append(InputField("file_directory", InputType.STRING, SettingsHolder))
-		dpg.add_text("File Name")
-		input_fields.append(InputField("file_name", InputType.STRING, SettingsHolder))
-	
-	with dpg.group(horizontal=True):
-		dpg.add_text("Magnet Voltage Compliance")
-		input_fields.append(InputField("powersupply_voltage_compliance", InputType.INT, SettingsHolder))
-
-	with dpg.group(horizontal=True):
-		dpg.add_text("Current Source Compliance")
-		input_fields.append(InputField("currentsource_compliance", InputType.INT, SettingsHolder))
-
-	with dpg.group(horizontal=True):
-		dpg.add_text("Nanovoltmeter Range")
-		input_fields.append(InputField("nanovoltmeter_range", InputType.INT, SettingsHolder))
-	
-	with dpg.group(horizontal=True):
-		dpg.add_text("Milliseconds Between Measurements")
-		input_fields.append(InputField("milliseconds_between_measurements", InputType.INT, SettingsHolder))
+	input_fields.append(InputField("File Directory", "file_directory", InputType.STRING, SettingsHolder))
+	input_fields.append(InputField("File Name", "file_name", InputType.STRING, SettingsHolder))
+	input_fields.append(InputField("Magnet Voltage Compliance", "powersupply_voltage_compliance", InputType.INT, SettingsHolder))
+	input_fields.append(InputField("Current Source Compliance", "currentsource_compliance", InputType.INT, SettingsHolder))
+	input_fields.append(InputField("Nanovoltmeter Range", "nanovoltmeter_range", InputType.INT, SettingsHolder))
+	input_fields.append(InputField("Milliseconds Between Measurements", "milliseconds_between_measurements", InputType.INT, SettingsHolder))
 
 	dpg.add_text("\n\nThe following are what you really tend to need for experimentation.")
-	with dpg.group(horizontal=True):
-		dpg.add_text("Current Source Amperage")
-		input_fields.append(InputField("currentsource_amperage", InputType.INT, SettingsHolder))
-
-	with dpg.group(horizontal=True):
-		dpg.add_text("Magnet Current Amperage")
-		input_fields.append(InputField("powersupply_current", InputType.INT, SettingsHolder))
-
+	input_fields.append(InputField("Current Source Amperage", "currentsource_amperage", InputType.INT, SettingsHolder))
+	input_fields.append(InputField("Magnet Current Amperage", "powersupply_current", InputType.INT, SettingsHolder))
 	dpg.add_button(label = "Submit", callback = send_information)
 
 	dpg.add_text("\n\n\n")
