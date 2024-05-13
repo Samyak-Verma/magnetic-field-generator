@@ -119,14 +119,17 @@ class DataCollector(Observable):
 		time_two = round((time.time() - self.start_time) - self.time_to_initialize, ndigits = 1)
 		print(span.blue(f"Voltage^2 Read: {voltage_two}"))
 
-		print(span.green(f"deltaVoltage: {voltage_two - voltage_one}"))
+		delta_voltage = voltage_two - voltage_one
+		print(span.green(f"deltaVoltage: {delta_voltage}"))
 
 		#write resutls to CSV. can't use CSVwriter class here because we're doing something special
 		with open(self.filename, 'a', newline='') as csvfile:
 			writer = csv.writer(csvfile)
-			writer.writerow(["Time", "Current Amperage", "Voltage"])
+			writer.writerow(["Time", "Current Amperage", "Voltage", f"deltaVoltage: {delta_voltage}"])
 			writer.writerow([time_one, magnet_amperage_one, voltage_one])
 			writer.writerow([time_two, 0, voltage_two])
+
+		print(f"Data written to {self.filename}")
 
 	def increment_stage(self):
 		self.current_stage += 1
