@@ -10,7 +10,7 @@ class Settings(object):
 			"currentsource_compliance": 10,
 			"file_name": "default.csv",
 			"milliseconds_between_measurements": 0,
-			"nanovoltmeter_range": 10,
+			"nanovoltmeter_range": 1e-2,
 			"file_directory": "./output",
 			"powersupply_current": 0.1,
 			"powersupply_voltage_compliance": 20,
