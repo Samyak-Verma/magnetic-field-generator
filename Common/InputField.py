@@ -2,7 +2,7 @@ import dearpygui.dearpygui as dpg
 from enum import Enum
 from Common.Settings import Settings
 
-debug_mode = False
+debug_mode = True
 class InputType(Enum):
 	INT = 0
 	FLOAT = 1

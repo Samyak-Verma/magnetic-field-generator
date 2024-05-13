@@ -10,17 +10,13 @@ from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
 if os.path.exists('output') == False:
 	os.mkdir('output')
 
-def check_and_get_filename(SettingsHolder: Settings):
-	if SettingsHolder.using_toml() is False:
-		print("You must set USE_TOML to true in MagneticFieldSettings.toml to use this script.")
-		return
-	
-	toml_file_name = SettingsHolder.get("file_name")
-	if(toml_file_name == SettingsHolder.defaults["file_name"]):
-		toml_file_name = f"output-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
-		print(f"We are loading a default file name from TOML, using a safety feature to avoid this. Will save as {toml_file_name}")
+def check_and_get_filename(SettingsHolder: Settings):	
+	file_name = SettingsHolder.get("file_name")
+	if(file_name == SettingsHolder.defaults["file_name"]):
+		file_name = f"output-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
+		print(f"We are loading a default file name from TOML, using a safety feature to avoid this. Will save as {file_name}")
 
-	return f"output/{toml_file_name}"
+	return f"{SettingsHolder.get("file_directory")}/{file_name}"
 
 def setup_machines(SettingsHolder: Settings):
 	rm = visa.ResourceManager()
@@ -117,9 +113,15 @@ def standard_operation(SettingsHolder):
 	for thing in machines_dict:
 		machines_dict[thing].close()
 
+def CLI_input(SettingsHolder: Settings):
+	SettingsHolder.set("powersupply_current", float(input("Enter the current for the magnet (A): ")))
+	SettingsHolder.set("currentsource_amperage", float(input("Enter the amperage for the current source (A): ")))
 
 def main():
 	SettingsHolder = Settings()
+
+	if SettingsHolder.using_toml() is False:
+		CLI_input(SettingsHolder)
 
 	standard_operation(SettingsHolder)
 

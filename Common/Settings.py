@@ -15,7 +15,7 @@ class Settings(object):
 			"powersupply_current": 0.5,
 			"powersupply_voltage_compliance": 20,
 		})
-		self.settings = None
+		self.settings = {"USE_TOML": False}
 
 		if not os.path.exists(self.toml_path):
 			self.generate_toml()
@@ -65,9 +65,6 @@ class Settings(object):
 		return self.defaults[key]
 	
 	def set(self, key, value): # will work regardless if using_toml is true or false
-		if self.settings is None:
-			self.settings = dict()
-
 		self.settings[key] = value
 	
 # we want to set up the toml file if it doesn't exist when the user installs the dependencies via the BAT file but not when we import this
