@@ -1,6 +1,7 @@
 import pyvisa as visa
 import os
 import time
+import csv
 from datetime import datetime
 from Common.CSVWriter import CSVWriter
 from Common.Observable import Observable
@@ -56,6 +57,7 @@ class DataCollector(Observable):
 		self.wait_time = SettingsHolder.get("milliseconds_between_measurements") / 1000
 		self.Supply: PowerSupply = machines_dict["Power Supply"]
 		self.Source: CurrentSource = machines_dict["Current Source"]
+		self.filename = filename
 		self.CSV = CSVWriter(
 			file_path = filename,
 			power_amperage = self.Supply.current,
@@ -88,13 +90,12 @@ class DataCollector(Observable):
 			time_of_measurement = f'{raw_time_of_measurement:10.2f}'
 	
 			print(f"Voltage Read: {read_voltage}")
-			# results_dict = {
-			# 	"time": time_of_measurement,
-			# 	"stage_voltage": self.current_stage,
-			# 	"read_voltage": read_voltage,
-			# }
-			# self.CSV.write(results_dict)
-			# above broken due to single_run, fix later
+			results_dict = {
+				"time": time_of_measurement,
+				"stage_voltage": self.current_stage,
+				"read_voltage": read_voltage,
+			}
+			self.CSV.write(results_dict)
 			
 			self.number_of_runs += 1
 
@@ -104,8 +105,10 @@ class DataCollector(Observable):
 		# We will then set Magnet Current to 0, and read the voltage again.
 		self.start_time = time.time()
 		self.nanovoltmeter.prepare_for_results()
+		magnet_amperage_one = self.Source.amperage
 		voltage_one = self.nanovoltmeter.get_results()
 		self.time_to_initialize = time.time() - self.start_time
+		time_one = round((time.time() - self.start_time) - self.time_to_initialize, ndigits = 1)
 		print(span.blue(f"Voltage^1 Read: {voltage_one}"))
 
 		print(f"Now turning the magnet current off.")
@@ -113,9 +116,17 @@ class DataCollector(Observable):
 		time.sleep(1) # let the magnet current pass a bit as a precaution
 		self.nanovoltmeter.prepare_for_results()
 		voltage_two = self.nanovoltmeter.get_results()
+		time_two = round((time.time() - self.start_time) - self.time_to_initialize, ndigits = 1)
 		print(span.blue(f"Voltage^2 Read: {voltage_two}"))
 
 		print(span.green(f"deltaVoltage: {voltage_two - voltage_one}"))
+
+		#write resutls to CSV
+		with open(self.filename, 'a', newline='') as csvfile:
+			writer = csv.writer(csvfile)
+			writer.writerow(["Time", "Current Amperage", "Voltage"])
+			writer.writerow([time_one, magnet_amperage_one, voltage_one])
+			writer.writerow([time_two, 0, voltage_two])
 
 	def increment_stage(self):
 		self.current_stage += 1
