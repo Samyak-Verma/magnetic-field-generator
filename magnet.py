@@ -4,13 +4,13 @@ import time
 from datetime import datetime
 from Common.CSVWriter import CSVWriter
 from Common.Observable import Observable
-from Common.TOMLSettings import TOMLSettings
+from Common.Settings import Settings
 from Common.VISAMachine import PowerSupply, VoltageNanovoltmeter, CurrentSource
 
 if os.path.exists('output') == False:
 	os.mkdir('output')
 
-def check_and_get_filename(SettingsHolder: TOMLSettings):
+def check_and_get_filename(SettingsHolder: Settings):
 	if SettingsHolder.using_toml() is False:
 		print("You must set USE_TOML to true in MagneticFieldSettings.toml to use this script.")
 		return
@@ -22,7 +22,7 @@ def check_and_get_filename(SettingsHolder: TOMLSettings):
 
 	return f"output/{toml_file_name}"
 
-def setup_machines(SettingsHolder: TOMLSettings):
+def setup_machines(SettingsHolder: Settings):
 	rm = visa.ResourceManager()
 	try:
 		Nanovoltmeter = VoltageNanovoltmeter(
@@ -53,10 +53,10 @@ def setup_machines(SettingsHolder: TOMLSettings):
 	}
 
 class DataCollector(Observable):
-	def __init__(self, machines_dict, filename, TOMLSettingsHolder: TOMLSettings):
+	def __init__(self, machines_dict, filename, SettingsHolder: Settings):
 		super().__init__()
 		self.nanovoltmeter = machines_dict["Voltage Nanovoltmeter"]
-		self.wait_time = TOMLSettingsHolder.get("milliseconds_between_measurements") / 1000
+		self.wait_time = SettingsHolder.get("milliseconds_between_measurements") / 1000
 		self.Supply: PowerSupply = machines_dict["Power Supply"]
 		self.Source: CurrentSource = machines_dict["Current Source"]
 		self.CSV = CSVWriter(
@@ -102,23 +102,27 @@ class DataCollector(Observable):
 
 	def increment_stage(self):
 		self.current_stage += 1
-		self.Supply.write("whatever")
+		# self.Supply.write("whatever")
 		return
 
 
-def main():
-	TOMLSettingsHolder = TOMLSettings()
+def standard_operation(SettingsHolder):
+	file_name = check_and_get_filename(SettingsHolder)
+	machines_dict = setup_machines(SettingsHolder)
 
-	file_name = check_and_get_filename(TOMLSettingsHolder)
-	machines_dict = setup_machines(TOMLSettingsHolder)
-
-	data_collector = DataCollector(machines_dict, file_name, TOMLSettingsHolder)
+	data_collector = DataCollector(machines_dict, file_name, SettingsHolder)
 	data_collector.collect_data()
-
 	# record_data_in_excel(user_current, file_name)
 
 	for thing in machines_dict:
 		machines_dict[thing].close()
+
+
+def main():
+	SettingsHolder = Settings()
+
+	standard_operation(SettingsHolder)
+
 
 if __name__ == "__main__":
 	main()

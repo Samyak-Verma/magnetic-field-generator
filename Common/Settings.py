@@ -1,7 +1,7 @@
 import toml
 import os
 
-class TOMLSettings(object):
+class Settings(object):
 	def __init__(self):
 		self.toml_path = "./MagneticFieldSettings.toml"
 		# Edit these defaults as needed
@@ -49,15 +49,27 @@ class TOMLSettings(object):
 	def using_toml(self):
 		if self.settings is None:
 			return False
+		
+		if self.settings["USE_TOML"] is False:
+			return False
 
 		return True
 
 	def get(self, key):
 		if self.using_toml() is False:
-			return self.defaults[key]
+			return self.get_default(key)
 
 		return self.settings[key]
 	
+	def get_default(self, key):
+		return self.defaults[key]
+	
+	def set(self, key, value): # will work regardless if using_toml is true or false
+		if self.settings is None:
+			self.settings = dict()
+
+		self.settings[key] = value
+	
 # we want to set up the toml file if it doesn't exist when the user installs the dependencies via the BAT file but not when we import this
 if __name__ == "__main__":
-	TOMLSettings()
+	Settings()
