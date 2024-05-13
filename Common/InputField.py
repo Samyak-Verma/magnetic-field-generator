@@ -2,6 +2,7 @@ import dearpygui.dearpygui as dpg
 from enum import Enum
 from Common.Settings import Settings
 
+debug_mode = False
 class InputType(Enum):
 	INT = 0
 	FLOAT = 1
@@ -15,7 +16,7 @@ class InputField:
 		self.tag = tag
 		self.default_value = self.SettingsHolder.get(tag)
 		self.width = width
-		self.tooltip = tooltip
+		self.tooltip = tooltip if tooltip is not None else tag if debug_mode is True else None # bleh
 
 		self.create_input()
 
@@ -28,6 +29,11 @@ class InputField:
 				dpg.add_input_float(tag = self.tag, width = self.width, default_value = self.default_value)
 			elif self.type is InputType.STRING:
 				dpg.add_input_text(tag = self.tag, width = self.width, default_value = self.default_value)
+			if self.tooltip is None:
+				return
+			
+			with dpg.tooltip(self.tag):
+				dpg.add_text(self.tooltip)
 
 	def get_tag(self):
 		return self.tag
