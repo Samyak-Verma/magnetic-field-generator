@@ -68,7 +68,7 @@ class DataCollector(Observable):
 		self.number_of_runs = 0
 		self.current_stage = 0
 
-	def collect_data(self):
+	def collect_data_infinit(self):
 		self.start_time = time.time()
 		while True:
 			if(self.number_of_runs is not 0 and self.number_of_runs % 10 is 0 and self.current_stage >= 5):
@@ -86,14 +86,14 @@ class DataCollector(Observable):
 			raw_time_of_measurement = round((time.time() - self.start_time) - self.time_to_initialize, ndigits = 1) # we can be more precise in time measurement but it doesn't matter
 			time_of_measurement = f'{raw_time_of_measurement:10.2f}'
 	
-			print(read_voltage)
+			print(f"Voltage Read: {read_voltage}")
 			results_dict = {
 				"time": time_of_measurement,
 				"stage_voltage": self.current_stage,
 				"read_voltage": read_voltage,
 			}
 			self.CSV.write(results_dict)
-
+			
 			self.number_of_runs += 1
 
 	def increment_stage(self):
