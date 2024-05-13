@@ -12,7 +12,7 @@ class Settings(object):
 			"milliseconds_between_measurements": 0,
 			"nanovoltmeter_range": 10,
 			"file_directory": "./output",
-			"powersupply_current": 0.5,
+			"powersupply_current": 0.1,
 			"powersupply_voltage_compliance": 20,
 		})
 		self.settings = {"USE_TOML": False}
@@ -56,7 +56,7 @@ class Settings(object):
 		return True
 
 	def get(self, key):
-		if self.using_toml() is False:
+		if self.using_toml() is False and key not in self.settings:
 			return self.get_default(key)
 
 		return self.settings[key]
