@@ -121,7 +121,7 @@ class DataCollector(Observable):
 
 		print(span.green(f"deltaVoltage: {voltage_two - voltage_one}"))
 
-		#write resutls to CSV
+		#write resutls to CSV. can't use CSVwriter class here because we're doing something special
 		with open(self.filename, 'a', newline='') as csvfile:
 			writer = csv.writer(csvfile)
 			writer.writerow(["Time", "Current Amperage", "Voltage"])
